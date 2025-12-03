@@ -1,22 +1,22 @@
 //
-//  ChatView.swift
+//  JSONChatView.swift
 //  ai-learning-course
 //
-//  Created by Claude Code on 01.12.2025.
+//  Created by Claude Code on 02.12.2025.
 //
 
 import SwiftUI
 
-struct ChatView: View {
+struct JSONChatView: View {
     let day: Day
 
-    @StateObject private var viewModel: ChatViewModel
+    @StateObject private var viewModel: JSONChatViewModel
     @FocusState private var isInputFocused: Bool
     @State private var showClearConfirmation = false
 
     init(day: Day) {
         self.day = day
-        _viewModel = StateObject(wrappedValue: ChatViewModel(dayId: day.id))
+        _viewModel = StateObject(wrappedValue: JSONChatViewModel(dayId: day.id))
     }
 
     var body: some View {
@@ -25,10 +25,10 @@ struct ChatView: View {
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         if viewModel.messages.isEmpty {
-                            EmptyChatView()
+                            EmptyJSONChatView()
                         } else {
                             ForEach(viewModel.messages) { message in
-                                MessageBubble(message: message)
+                                JSONMessageBubble(message: message)
                                     .id(message.id)
                             }
                         }
@@ -92,7 +92,7 @@ struct ChatView: View {
     }
 }
 
-class ChatViewModel: ObservableObject {
+class JSONChatViewModel: ObservableObject {
     @Published var messages: [ChatMessage] = [] {
         didSet {
             saveHistory()
@@ -106,8 +106,33 @@ class ChatViewModel: ObservableObject {
     private let claudeManager = ClaudeManager.shared
     private let dayId: Int
     private var historyKey: String {
-        "chatHistory_day_\(dayId)"
+        "jsonChatHistory_day_\(dayId)"
     }
+
+    private let jsonSystemPrompt = """
+CRITICAL INSTRUCTION: You MUST respond with ONLY raw JSON. NO markdown code blocks.
+
+FORBIDDEN - Never use these:
+- ```json
+- ```
+- Any backticks or code fences
+
+REQUIRED FORMAT:
+Your response must start with { or [ immediately
+Your response must end with } or ] immediately
+No text before or after the JSON
+All JSON keys MUST be in English only (no Russian, no other languages)
+
+CORRECT example:
+{"response": "This is my answer", "timestamp": "2025-12-02"}
+
+WRONG example (NEVER DO THIS):
+```json
+{"ответ": "This is my answer"}
+```
+
+Your ENTIRE response = valid JSON object or array with English keys only. Nothing else.
+"""
 
     init(dayId: Int) {
         self.dayId = dayId
@@ -128,7 +153,8 @@ class ChatViewModel: ObservableObject {
 
         do {
             let response = try await claudeManager.sendMessage(
-                messages: messages
+                messages: messages,
+                systemPrompt: jsonSystemPrompt
             )
 
             let assistantMessage = ChatMessage(role: .assistant, content: response)
@@ -169,7 +195,7 @@ class ChatViewModel: ObservableObject {
     }
 }
 
-struct MessageBubble: View {
+struct JSONMessageBubble: View {
     let message: ChatMessage
 
     var body: some View {
@@ -179,11 +205,24 @@ struct MessageBubble: View {
             }
 
             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
-                Text(message.content)
-                    .padding(12)
-                    .background(bubbleColor)
-                    .foregroundColor(textColor)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                if message.role == .assistant {
+                    // Pretty print JSON for assistant messages
+                    Text(prettyPrintedJSON(message.content))
+                        .font(.system(.caption, design: .monospaced))
+                        .padding(12)
+                        .background(bubbleColor)
+                        .foregroundColor(textColor)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .textSelection(.enabled)
+                } else {
+                    // Regular display for user messages
+                    Text(message.content)
+                        .font(.body)
+                        .padding(12)
+                        .background(bubbleColor)
+                        .foregroundColor(textColor)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
 
                 Text(formatTimestamp(message.timestamp))
                     .font(.caption2)
@@ -204,6 +243,18 @@ struct MessageBubble: View {
         message.role == .user ? .white : .primary
     }
 
+    private func prettyPrintedJSON(_ jsonString: String) -> String {
+        // Try to parse and pretty print JSON
+        guard let data = jsonString.data(using: .utf8),
+              let jsonObject = try? JSONSerialization.jsonObject(with: data),
+              let prettyData = try? JSONSerialization.data(withJSONObject: jsonObject, options: [.prettyPrinted, .sortedKeys]),
+              let prettyString = String(data: prettyData, encoding: .utf8) else {
+            // If parsing fails, return original string
+            return jsonString
+        }
+        return prettyString
+    }
+
     private func formatTimestamp(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
@@ -211,18 +262,18 @@ struct MessageBubble: View {
     }
 }
 
-struct EmptyChatView: View {
+struct EmptyJSONChatView: View {
     var body: some View {
         VStack(spacing: 16) {
-            Image(systemName: "bubble.left.and.bubble.right")
+            Image(systemName: "curlybraces")
                 .font(.system(size: 60))
                 .foregroundColor(.secondary)
 
-            Text("Start a conversation")
+            Text("JSON Chat")
                 .font(.title3)
                 .fontWeight(.semibold)
 
-            Text("Ask Claude anything to begin your learning journey")
+            Text("Ask Claude anything and receive JSON responses")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -232,79 +283,13 @@ struct EmptyChatView: View {
     }
 }
 
-struct TypingIndicator: View {
-    @State private var animationAmount: CGFloat = 1
-
-    var body: some View {
-        HStack(spacing: 8) {
-            ForEach(0..<3) { index in
-                Circle()
-                    .fill(Color.secondary)
-                    .frame(width: 8, height: 8)
-                    .scaleEffect(animationAmount)
-                    .animation(
-                        .easeInOut(duration: 0.6)
-                        .repeatForever()
-                        .delay(Double(index) * 0.2),
-                        value: animationAmount
-                    )
-            }
-        }
-        .padding(12)
-        .background(Color(.systemGray5))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .onAppear {
-            animationAmount = 0.5
-        }
-    }
-}
-
-struct MessageInputView: View {
-    @Binding var messageText: String
-    let isLoading: Bool
-    var isFocused: FocusState<Bool>.Binding
-    let onSend: () -> Void
-
-    var body: some View {
-        HStack(alignment: .bottom, spacing: 12) {
-            TextField("Type a message...", text: $messageText, axis: .vertical)
-                .textFieldStyle(.plain)
-                .padding(12)
-                .background(Color(.systemGray6))
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-                .focused(isFocused)
-                .lineLimit(1...6)
-                .onSubmit {
-                    if !isLoading && !messageText.isEmpty {
-                        onSend()
-                    }
-                }
-
-            Button(action: onSend) {
-                Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 32))
-                    .foregroundColor(canSend ? .blue : .gray)
-            }
-            .disabled(!canSend)
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-        .background(Color(.systemBackground))
-    }
-
-    private var canSend: Bool {
-        !isLoading && !messageText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-}
-
 #Preview {
     NavigationStack {
-        ChatView(day: Day(
-            id: 1,
+        JSONChatView(day: Day(
+            id: 2,
             weekId: 1,
-            title: "Day 1: Free Chat",
-            description: "Chat with Claude",
+            title: "Day 2: JSON Chat",
+            description: "Chat with Claude in JSON format",
             type: .chat
         ))
     }

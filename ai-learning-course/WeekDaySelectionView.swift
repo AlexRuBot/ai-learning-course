@@ -42,9 +42,12 @@ struct WeekDaySelectionView: View {
                 SettingsView()
             }
             .navigationDestination(item: $selectedDay) { day in
-                if day.type == .chat {
+                switch day.type {
+                case .chat:
                     ChatView(day: day)
-                } else {
+                case .jsonChat:
+                    JSONChatView(day: day)
+                default:
                     ComingSoonView(day: day)
                 }
             }
@@ -163,6 +166,8 @@ struct DayRow: View {
         switch day.type {
         case .chat:
             return "bubble.left.and.bubble.right.fill"
+        case .jsonChat:
+            return "curlybraces"
         case .lesson:
             return "book.fill"
         case .exercise:
@@ -174,6 +179,8 @@ struct DayRow: View {
         switch day.type {
         case .chat:
             return .blue
+        case .jsonChat:
+            return .purple
         case .lesson:
             return .green
         case .exercise:

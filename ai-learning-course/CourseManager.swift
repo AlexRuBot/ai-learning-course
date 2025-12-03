@@ -28,9 +28,9 @@ class CourseManager: ObservableObject {
                     Day(
                         id: 2,
                         weekId: 1,
-                        title: "Day 2: Coming Soon",
-                        description: "More content coming soon",
-                        type: .lesson
+                        title: "Day 2: JSON Response Chat",
+                        description: "Chat with Claude receiving pure JSON responses",
+                        type: .jsonChat
                     )
                 ]
             )
