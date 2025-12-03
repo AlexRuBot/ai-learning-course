@@ -31,6 +31,13 @@ class CourseManager: ObservableObject {
                         title: "Day 2: JSON Response Chat",
                         description: "Chat with Claude receiving pure JSON responses",
                         type: .jsonChat
+                    ),
+                    Day(
+                        id: 3,
+                        weekId: 1,
+                        title: "Day 3: Interactive Clarification",
+                        description: "Claude asks clarifying questions before answering",
+                        type: .clarificationChat
                     )
                 ]
             )

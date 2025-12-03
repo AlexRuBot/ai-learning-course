@@ -26,6 +26,7 @@ struct Day: Identifiable, Codable, Hashable {
 enum DayType: String, Codable {
     case chat
     case jsonChat
+    case clarificationChat
     case lesson
     case exercise
 }
