@@ -27,6 +27,7 @@ enum DayType: String, Codable {
     case chat
     case jsonChat
     case clarificationChat
+    case systemPromptChat
     case lesson
     case exercise
 }

@@ -38,6 +38,13 @@ class CourseManager: ObservableObject {
                         title: "Day 3: Interactive Clarification",
                         description: "Claude asks clarifying questions before answering",
                         type: .clarificationChat
+                    ),
+                    Day(
+                        id: 5,
+                        weekId: 1,
+                        title: "Day 5: Dynamic System Prompt",
+                        description: "Change Claude's behavior by modifying system prompts",
+                        type: .systemPromptChat
                     )
                 ]
             )

@@ -49,6 +49,8 @@ struct WeekDaySelectionView: View {
                     JSONChatView(day: day)
                 case .clarificationChat:
                     ClarificationChatView(day: day)
+                case .systemPromptChat:
+                    SystemPromptChatView(day: day)
                 default:
                     ComingSoonView(day: day)
                 }
@@ -172,6 +174,8 @@ struct DayRow: View {
             return "curlybraces"
         case .clarificationChat:
             return "questionmark.bubble.fill"
+        case .systemPromptChat:
+            return "brain.head.profile"
         case .lesson:
             return "book.fill"
         case .exercise:
@@ -187,6 +191,8 @@ struct DayRow: View {
             return .purple
         case .clarificationChat:
             return .teal
+        case .systemPromptChat:
+            return .indigo
         case .lesson:
             return .green
         case .exercise:
