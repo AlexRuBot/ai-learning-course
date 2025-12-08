@@ -51,6 +51,8 @@ struct WeekDaySelectionView: View {
                     ClarificationChatView(day: day)
                 case .systemPromptChat:
                     SystemPromptChatView(day: day)
+                case .temperatureChat:
+                    TemperatureChatView(day: day)
                 default:
                     ComingSoonView(day: day)
                 }
@@ -176,6 +178,8 @@ struct DayRow: View {
             return "questionmark.bubble.fill"
         case .systemPromptChat:
             return "brain.head.profile"
+        case .temperatureChat:
+            return "thermometer.medium"
         case .lesson:
             return "book.fill"
         case .exercise:
@@ -193,6 +197,8 @@ struct DayRow: View {
             return .teal
         case .systemPromptChat:
             return .indigo
+        case .temperatureChat:
+            return .red
         case .lesson:
             return .green
         case .exercise:

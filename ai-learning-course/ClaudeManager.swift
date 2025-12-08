@@ -30,7 +30,8 @@ class ClaudeManager: ObservableObject {
 
     func sendMessage(
         messages: [ChatMessage],
-        systemPrompt: String? = nil
+        systemPrompt: String? = nil,
+        temperature: Double? = nil
     ) async throws -> String {
         guard isAPIKeySet else {
             throw NetworkError.httpError(statusCode: 401, message: "API key not set")
@@ -48,7 +49,8 @@ class ClaudeManager: ObservableObject {
             model: modelName,
             maxTokens: 4096,
             messages: claudeMessages,
-            system: systemPrompt
+            system: systemPrompt,
+            temperature: temperature
         )
 
         let headers = [

@@ -47,6 +47,19 @@ class CourseManager: ObservableObject {
                         type: .systemPromptChat
                     )
                 ]
+            ),
+            Week(
+                id: 2,
+                title: "Week 2: Advanced Features",
+                days: [
+                    Day(
+                        id: 6,
+                        weekId: 2,
+                        title: "Day 1: Temperature Control",
+                        description: "Adjust AI creativity by controlling temperature parameter",
+                        type: .temperatureChat
+                    )
+                ]
             )
         ]
     }

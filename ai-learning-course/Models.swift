@@ -28,6 +28,7 @@ enum DayType: String, Codable {
     case jsonChat
     case clarificationChat
     case systemPromptChat
+    case temperatureChat
     case lesson
     case exercise
 }
@@ -60,12 +61,14 @@ struct ClaudeRequest: Codable {
     let maxTokens: Int
     let messages: [ClaudeMessage]
     let system: String?
+    let temperature: Double?
 
     enum CodingKeys: String, CodingKey {
         case model
         case maxTokens = "max_tokens"
         case messages
         case system
+        case temperature
     }
 }
 
