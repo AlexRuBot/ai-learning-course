@@ -58,6 +58,13 @@ class CourseManager: ObservableObject {
                         title: "Day 1: Temperature Control",
                         description: "Adjust AI creativity by controlling temperature parameter",
                         type: .temperatureChat
+                    ),
+                    Day(
+                        id: 7,
+                        weekId: 2,
+                        title: "Day 2: AI Model Comparison",
+                        description: "Compare responses from 3 different AI models with Claude's analysis",
+                        type: .comparisonChat
                     )
                 ]
             )

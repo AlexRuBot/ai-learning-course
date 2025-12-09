@@ -29,6 +29,7 @@ enum DayType: String, Codable {
     case clarificationChat
     case systemPromptChat
     case temperatureChat
+    case comparisonChat
     case lesson
     case exercise
 }
@@ -116,4 +117,84 @@ struct ClaudeError: Codable {
 struct ErrorDetail: Codable {
     let type: String
     let message: String
+}
+
+// MARK: - HuggingFace API Models (Chat Completions)
+
+struct HuggingFaceChatRequest: Codable {
+    let model: String
+    let messages: [HuggingFaceMessage]
+    let maxTokens: Int?
+    let temperature: Double?
+    let stream: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case model
+        case messages
+        case maxTokens = "max_tokens"
+        case temperature
+        case stream
+    }
+}
+
+struct HuggingFaceMessage: Codable {
+    let role: String
+    let content: String
+}
+
+struct HuggingFaceChatResponse: Codable {
+    let id: String?
+    let choices: [HuggingFaceChoice]
+    let usage: HuggingFaceUsage?
+}
+
+struct HuggingFaceChoice: Codable {
+    let message: HuggingFaceMessage
+    let finishReason: String?
+
+    enum CodingKeys: String, CodingKey {
+        case message
+        case finishReason = "finish_reason"
+    }
+}
+
+struct HuggingFaceUsage: Codable {
+    let promptTokens: Int?
+    let completionTokens: Int?
+    let totalTokens: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case promptTokens = "prompt_tokens"
+        case completionTokens = "completion_tokens"
+        case totalTokens = "total_tokens"
+    }
+}
+
+struct HuggingFaceError: Codable {
+    let error: String
+    let estimatedTime: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case error
+        case estimatedTime = "estimated_time"
+    }
+}
+
+// MARK: - Comparison Models
+
+struct ModelResponse: Identifiable {
+    let id = UUID()
+    let modelName: String
+    let response: String
+    let responseTime: TimeInterval
+    let inputTokens: Int
+    let outputTokens: Int
+    let error: String?
+}
+
+struct ComparisonResult {
+    let query: String
+    let responses: [ModelResponse]
+    let claudeAnalysis: String?
+    let isLoading: Bool
 }

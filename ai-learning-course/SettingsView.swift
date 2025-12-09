@@ -9,7 +9,9 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var claudeManager = ClaudeManager.shared
+    @ObservedObject var hfManager = HuggingFaceManager.shared
     @State private var apiKeyInput: String = ""
+    @State private var hfApiKeyInput: String = ""
     @State private var showSaveConfirmation = false
     @Environment(\.dismiss) var dismiss
 
@@ -47,6 +49,37 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    SecureField("Enter HuggingFace API key", text: $hfApiKeyInput)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+
+                    Button(action: saveHFAPIKey) {
+                        HStack {
+                            Spacer()
+                            Text("Save HuggingFace Key")
+                                .fontWeight(.semibold)
+                            Spacer()
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.purple)
+                    .disabled(hfApiKeyInput.isEmpty)
+
+                    if hfManager.isAPIKeySet {
+                        Label("HuggingFace key is set", systemImage: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                    }
+                } header: {
+                    Text("HuggingFace API Configuration")
+                } footer: {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Required for AI model comparison feature.")
+                        Text("Get your API key at: huggingface.co/settings/tokens")
+                            .font(.caption)
+                    }
+                }
+
+                Section {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             Image(systemName: "info.circle")
@@ -73,6 +106,7 @@ struct SettingsView: View {
             }
             .onAppear {
                 apiKeyInput = claudeManager.apiKey
+                hfApiKeyInput = hfManager.apiKey
             }
             .alert("Success", isPresented: $showSaveConfirmation) {
                 Button("OK", role: .cancel) { }
@@ -84,6 +118,11 @@ struct SettingsView: View {
 
     private func saveAPIKey() {
         claudeManager.apiKey = apiKeyInput
+        showSaveConfirmation = true
+    }
+
+    private func saveHFAPIKey() {
+        hfManager.apiKey = hfApiKeyInput
         showSaveConfirmation = true
     }
 }
