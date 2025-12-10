@@ -55,6 +55,8 @@ struct WeekDaySelectionView: View {
                     TemperatureChatView(day: day)
                 case .comparisonChat:
                     ComparisonChatView(day: day)
+                case .tokenTrackingChat:
+                    TokenTrackingChatView(day: day)
                 default:
                     ComingSoonView(day: day)
                 }
@@ -184,6 +186,8 @@ struct DayRow: View {
             return "thermometer.medium"
         case .comparisonChat:
             return "chart.bar.xaxis"
+        case .tokenTrackingChat:
+            return "chart.bar.doc.horizontal.fill"
         case .lesson:
             return "book.fill"
         case .exercise:
@@ -205,6 +209,8 @@ struct DayRow: View {
             return .red
         case .comparisonChat:
             return .orange
+        case .tokenTrackingChat:
+            return .cyan
         case .lesson:
             return .green
         case .exercise:

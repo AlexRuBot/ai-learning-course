@@ -30,6 +30,7 @@ enum DayType: String, Codable {
     case systemPromptChat
     case temperatureChat
     case comparisonChat
+    case tokenTrackingChat
     case lesson
     case exercise
 }
@@ -41,12 +42,23 @@ struct ChatMessage: Identifiable, Codable {
     let role: MessageRole
     let content: String
     let timestamp: Date
+    let tokenUsage: TokenUsage?
 
-    init(id: UUID = UUID(), role: MessageRole, content: String, timestamp: Date = Date()) {
+    init(id: UUID = UUID(), role: MessageRole, content: String, timestamp: Date = Date(), tokenUsage: TokenUsage? = nil) {
         self.id = id
         self.role = role
         self.content = content
         self.timestamp = timestamp
+        self.tokenUsage = tokenUsage
+    }
+}
+
+struct TokenUsage: Codable {
+    let inputTokens: Int
+    let outputTokens: Int
+
+    var totalTokens: Int {
+        inputTokens + outputTokens
     }
 }
 

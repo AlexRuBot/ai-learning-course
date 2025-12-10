@@ -7,6 +7,11 @@
 
 import Foundation
 
+struct ClaudeMessageResult {
+    let text: String
+    let tokenUsage: TokenUsage
+}
+
 class ClaudeManager: ObservableObject {
     static let shared = ClaudeManager()
 
@@ -20,8 +25,15 @@ class ClaudeManager: ObservableObject {
         }
     }
 
+    @Published var maxTokens: Int {
+        didSet {
+            UserDefaults.standard.set(maxTokens, forKey: "maxTokens")
+        }
+    }
+
     private init() {
         self.apiKey = UserDefaults.standard.string(forKey: "claudeAPIKey") ?? ""
+        self.maxTokens = UserDefaults.standard.integer(forKey: "maxTokens") == 0 ? 4096 : UserDefaults.standard.integer(forKey: "maxTokens")
     }
 
     var isAPIKeySet: Bool {
@@ -32,7 +44,7 @@ class ClaudeManager: ObservableObject {
         messages: [ChatMessage],
         systemPrompt: String? = nil,
         temperature: Double? = nil
-    ) async throws -> String {
+    ) async throws -> ClaudeMessageResult {
         guard isAPIKeySet else {
             throw NetworkError.httpError(statusCode: 401, message: "API key not set")
         }
@@ -47,7 +59,7 @@ class ClaudeManager: ObservableObject {
 
         let request = ClaudeRequest(
             model: modelName,
-            maxTokens: 4096,
+            maxTokens: maxTokens,
             messages: claudeMessages,
             system: systemPrompt,
             temperature: temperature
@@ -70,13 +82,18 @@ class ClaudeManager: ObservableObject {
             throw NetworkError.noData
         }
 
-        return text
+        let tokenUsage = TokenUsage(
+            inputTokens: response.usage.inputTokens,
+            outputTokens: response.usage.outputTokens
+        )
+
+        return ClaudeMessageResult(text: text, tokenUsage: tokenUsage)
     }
 
     func sendMessage(
         messageText: String,
         conversationHistory: [ChatMessage] = []
-    ) async throws -> String {
+    ) async throws -> ClaudeMessageResult {
         var allMessages = conversationHistory
         allMessages.append(ChatMessage(role: .user, content: messageText))
 
