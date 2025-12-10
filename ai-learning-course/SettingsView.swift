@@ -12,6 +12,7 @@ struct SettingsView: View {
     @ObservedObject var hfManager = HuggingFaceManager.shared
     @State private var apiKeyInput: String = ""
     @State private var hfApiKeyInput: String = ""
+    @State private var maxTokensInput: String = ""
     @State private var showSaveConfirmation = false
     @Environment(\.dismiss) var dismiss
 
@@ -80,6 +81,34 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    HStack {
+                        TextField("Max tokens (e.g., 4096)", text: $maxTokensInput)
+                            .keyboardType(.numberPad)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+
+                        Button("Save") {
+                            saveMaxTokens()
+                        }
+                        .buttonStyle(.borderless)
+                        .foregroundColor(.blue)
+                        .disabled(maxTokensInput.isEmpty || Int(maxTokensInput) == nil)
+                    }
+
+                    Text("Current: \(claudeManager.maxTokens) tokens")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } header: {
+                    Text("Token Limit")
+                } footer: {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Maximum number of tokens for API responses.")
+                        Text("Recommended: 1024-8192. Default: 4096")
+                            .font(.caption)
+                    }
+                }
+
+                Section {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             Image(systemName: "info.circle")
@@ -107,6 +136,7 @@ struct SettingsView: View {
             .onAppear {
                 apiKeyInput = claudeManager.apiKey
                 hfApiKeyInput = hfManager.apiKey
+                maxTokensInput = String(claudeManager.maxTokens)
             }
             .alert("Success", isPresented: $showSaveConfirmation) {
                 Button("OK", role: .cancel) { }
@@ -124,6 +154,13 @@ struct SettingsView: View {
     private func saveHFAPIKey() {
         hfManager.apiKey = hfApiKeyInput
         showSaveConfirmation = true
+    }
+
+    private func saveMaxTokens() {
+        if let tokens = Int(maxTokensInput), tokens > 0 {
+            claudeManager.maxTokens = tokens
+            showSaveConfirmation = true
+        }
     }
 }
 

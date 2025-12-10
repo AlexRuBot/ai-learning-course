@@ -216,12 +216,12 @@ When ready to provide final answer:
         }
 
         do {
-            let response = try await claudeManager.sendMessage(
+            let result = try await claudeManager.sendMessage(
                 messages: messages,
                 systemPrompt: systemPrompt
             )
 
-            let assistantMessage = ChatMessage(role: .assistant, content: response)
+            let assistantMessage = ChatMessage(role: .assistant, content: result.text)
 
             await MainActor.run {
                 messages.append(assistantMessage)

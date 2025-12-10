@@ -65,6 +65,13 @@ class CourseManager: ObservableObject {
                         title: "Day 2: AI Model Comparison",
                         description: "Compare responses from 3 different AI models with Claude's analysis",
                         type: .comparisonChat
+                    ),
+                    Day(
+                        id: 8,
+                        weekId: 2,
+                        title: "Day 3: Token Usage Tracking",
+                        description: "Monitor API token usage with real-time counting and cost estimation",
+                        type: .tokenTrackingChat
                     )
                 ]
             )

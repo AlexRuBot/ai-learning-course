@@ -372,8 +372,8 @@ class ComparisonChatViewModel: ObservableObject {
 
         do {
             let message = ChatMessage(role: .user, content: prompt)
-            let response = try await claudeManager.sendMessage(messages: [message])
-            return response
+            let result = try await claudeManager.sendMessage(messages: [message])
+            return result.text
         } catch {
             return "Error analyzing responses: \(error.localizedDescription)"
         }
