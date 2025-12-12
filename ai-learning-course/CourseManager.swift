@@ -72,6 +72,13 @@ class CourseManager: ObservableObject {
                         title: "Day 3: Token Usage Tracking",
                         description: "Monitor API token usage with real-time counting and cost estimation",
                         type: .tokenTrackingChat
+                    ),
+                    Day(
+                        id: 9,
+                        weekId: 2,
+                        title: "Day 4: Conversation Summary",
+                        description: "Auto-compress conversation history every 10 messages with AI summaries",
+                        type: .conversationSummaryChat
                     )
                 ]
             )

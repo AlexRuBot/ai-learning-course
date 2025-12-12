@@ -31,6 +31,7 @@ enum DayType: String, Codable {
     case temperatureChat
     case comparisonChat
     case tokenTrackingChat
+    case conversationSummaryChat
     case lesson
     case exercise
 }
