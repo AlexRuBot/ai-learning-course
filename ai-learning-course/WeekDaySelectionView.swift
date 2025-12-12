@@ -57,6 +57,8 @@ struct WeekDaySelectionView: View {
                     ComparisonChatView(day: day)
                 case .tokenTrackingChat:
                     TokenTrackingChatView(day: day)
+                case .conversationSummaryChat:
+                    ConversationSummaryChatView(day: day)
                 default:
                     ComingSoonView(day: day)
                 }
@@ -188,6 +190,8 @@ struct DayRow: View {
             return "chart.bar.xaxis"
         case .tokenTrackingChat:
             return "chart.bar.doc.horizontal.fill"
+        case .conversationSummaryChat:
+            return "doc.text.magnifyingglass"
         case .lesson:
             return "book.fill"
         case .exercise:
@@ -211,6 +215,8 @@ struct DayRow: View {
             return .orange
         case .tokenTrackingChat:
             return .cyan
+        case .conversationSummaryChat:
+            return .mint
         case .lesson:
             return .green
         case .exercise:
